@@ -1,6 +1,9 @@
 {
-  "name": "klura-mcp",
+  "name": "@klura/mcp",
   "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "MCP server for klura — exposes browser automation tools via Model Context Protocol",
   "main": "index.js",
   "bin": {
@@ -28,7 +31,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "klura": "^0.1.0"
+    "@klura/runtime": "^0.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -4,14 +4,14 @@
 // Works with Claude Desktop, Cursor, Windsurf, and any MCP client.
 //
 // Usage:
-//   npx klura-mcp             (stdio transport)
+//   npx @klura/mcp           (stdio transport)
 //
 // MCP config:
 //   {
 //     "mcpServers": {
 //       "klura": {
 //         "command": "npx",
-//         "args": ["klura-mcp"]
+//         "args": ["-y", "@klura/mcp"]
 //       }
 //     }
 //   }
@@ -27,7 +27,7 @@ async function createKluraMcpServer() {
   const { Server } = await import('@modelcontextprotocol/sdk/server/index.js');
   const { ListToolsRequestSchema, CallToolRequestSchema, ListResourcesRequestSchema, ReadResourceRequestSchema } = await import('@modelcontextprotocol/sdk/types.js');
   // Load klura runtime
-  const klura = require('klura');
+  const klura = require('@klura/runtime');
 
   // SKILL.md (compact) is the always-loaded orientation.
   // REFERENCE.md (detailed schemas, examples) is served as an on-demand
@@ -37,7 +37,7 @@ async function createKluraMcpServer() {
     .replace(/^---[\s\S]*?---\s*/, ''); // strip frontmatter
 
   const server = new Server(
-    { name: 'klura', version: '0.1.0' },
+    { name: '@klura/mcp', version: '0.1.0' },
     { capabilities: { tools: {}, resources: {} }, instructions: skillMd }
   );
 

@@ -20,11 +20,11 @@ const path = require('node:path');
 
 const defineTools = require('../tools.js');
 
-// klura is a runtime npm dep. Resolve its package root from node_modules
+// @klura/runtime is an npm dep. Resolve its package root from node_modules
 // so we can read its compiled exports + SKILL.md without booting the
-// runtime (require('klura') has side-effects — pool + driver init — that
-// don't belong in a tools-catalog lint test).
-const kluraPkgRoot = path.dirname(require.resolve('klura/package.json'));
+// runtime (require('@klura/runtime') has side-effects — pool + driver init —
+// that don't belong in a tools-catalog lint test).
+const kluraPkgRoot = path.dirname(require.resolve('@klura/runtime/package.json'));
 
 // Statically extract exported names from a compiled CJS module without
 // loading it. We only need the *names* to verify handler closures

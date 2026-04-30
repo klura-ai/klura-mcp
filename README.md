@@ -1,16 +1,16 @@
-# klura-mcp
+# @klura/mcp
 
-MCP (Model Context Protocol) server for [klura](https://www.npmjs.com/package/klura). Exposes the klura runtime's browser-automation + skill-discovery toolset to any MCP client — Claude Desktop, Claude Code, Cursor, Windsurf, and others.
+MCP (Model Context Protocol) server for [@klura/runtime](https://www.npmjs.com/package/@klura/runtime). Exposes the klura runtime's browser-automation + skill-discovery toolset to any MCP client — Claude Desktop, Claude Code, Cursor, Windsurf, and others.
 
-`klura` is the runtime that turns websites into reusable skills: drive the site once, save the recipe, skip the browser on every subsequent run. `klura-mcp` is the thin wrapper that speaks MCP on top of it. See the [runtime README](https://www.npmjs.com/package/klura) for what the skills actually do and how they get saved.
+`@klura/runtime` is the runtime that turns websites into reusable skills: drive the site once, save the recipe, skip the browser on every subsequent run. `@klura/mcp` is the thin wrapper that speaks MCP on top of it. See the [runtime README](https://www.npmjs.com/package/@klura/runtime) for what the skills actually do and how they get saved.
 
 ## Install
 
 ```bash
-npm install -g klura-mcp
+npm install -g @klura/mcp
 ```
 
-The `klura` runtime is declared as a dependency and installed alongside. The runtime auto-starts a local daemon on first use and stores everything it learns under `~/.klura/`.
+The `@klura/runtime` package is declared as a dependency and installed alongside. The runtime auto-starts a local daemon on first use and stores everything it learns under `~/.klura/`.
 
 ## Wire it up
 
@@ -21,7 +21,7 @@ Add the server to your MCP client's config. The exact file path depends on the c
   "mcpServers": {
     "klura": {
       "command": "npx",
-      "args": ["klura-mcp"]
+      "args": ["-y", "@klura/mcp"]
     }
   }
 }
@@ -47,13 +47,11 @@ MCP client (Claude Desktop, Cursor, …)
     │  stdio transport, JSON-RPC
     ▼
 klura-mcp (this package)
-    │  Node require('klura')
+    │  Node require('@klura/runtime')
     ▼
 klura runtime → local daemon → Playwright
 ```
 
 ## License
 
-Apache 2.0. See [LICENSE](LICENSE).
-
-The underlying `klura` runtime is licensed under BUSL-1.1; see the runtime README for the commercial-use terms.
+BUSL-1.1. See [LICENSE](LICENSE). Same terms as the underlying `@klura/runtime`; see the runtime README for the commercial-use terms.
