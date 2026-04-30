@@ -46,7 +46,7 @@ Thin wrapper — each MCP `tools/call` dispatches to the corresponding klura run
 MCP client (Claude Desktop, Cursor, …)
     │  stdio transport, JSON-RPC
     ▼
-klura-mcp (this package)
+@klura/mcp (this package)
     │  Node require('@klura/runtime')
     ▼
 klura runtime → local daemon → Playwright
