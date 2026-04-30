@@ -1,0 +1,40 @@
+{
+  "name": "klura-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for klura — exposes browser automation tools via Model Context Protocol",
+  "main": "index.js",
+  "bin": {
+    "klura-mcp": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "tools.js",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "mcp",
+    "klura",
+    "web-automation",
+    "browser"
+  ],
+  "license": "BUSL-1.1",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "klura": "^0.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.58.0"
+  }
+}
