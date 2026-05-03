@@ -998,7 +998,7 @@ module.exports = function defineTools(klura) {
 
     {
       name: 'start_remote_session',
-      description: 'Start a remote viewer so the user can see and interact with the browser. Returns a URL to share. Use when you hit a gate you cannot pass (captcha, bot detection, QR code). Also invoked transparently at execute time by `strategy.interrupts[]` entries whose handler is `user-assist` — those fire the viewer on an existing warm session without an explicit tool call.',
+      description: 'Start a remote viewer so the user can see and interact with the browser. Returns `{viewerUrl, _hint}` — render `viewerUrl` verbatim in chat (it carries a JWT, any retype/edit/abbreviation breaks the signature). Use when you hit a gate you cannot pass (captcha, bot detection, QR code). Also invoked transparently at execute time by `strategy.interrupts[]` entries whose handler is `user-assist` — those fire the viewer on an existing warm session without an explicit tool call.',
       inputSchema: {
         type: 'object',
         properties: {
