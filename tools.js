@@ -37,7 +37,7 @@ module.exports = function defineTools(klura) {
         type: 'object',
         properties: {
           url: { type: 'string', description: 'URL to navigate to' },
-          platform: { type: 'string', description: 'Optional platform name to load saved cookies' },
+          platform: { type: 'string', description: 'Platform slug — keys the on-disk skill dir (`~/.klura/skills/<platform>/`) and storage-state file (`~/.klura/storage-state/<platform>.json`). REQUIRED when `capability` is set; optional in pure-exploration mode (no capability declared). Common pattern: second-level domain (`messenger` for messenger.com, `reddit` for reddit.com).' },
           capability: { type: 'string', description: 'The capability slug being discovered or executed (e.g. "send_message"). Required for auto-execute and for auto-save at close_session.' },
           args: { type: 'object', description: 'Per-capability argument map: {paramName: literalValue}. These are the user-supplied values the agent will type (e.g. {text: "hello", recipient: "Bob"}). Used at auto-execute time to run the saved strategy, and at close_session time to template captured traffic into a reusable strategy body.' },
           policy: {
