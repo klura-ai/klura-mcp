@@ -207,7 +207,7 @@ async function createKluraMcpServer() {
 
       // Inject sticky LIFT obligation reminder. Fires on every tool
       // response between the first mutating perform_action and either a
-      // successful save_strategy or close_session ok:true. Once-per-session
+      // successful save_strategy or end_drive ok:true. Once-per-session
       // semantics → no token-binding needed (see runtime/docs/gates.md
       // §once-vs-many). klura.formatToolResult hoists the obligation
       // message into a leading [klura obligation]: <message> text block
@@ -239,8 +239,8 @@ async function createKluraMcpServer() {
       };
     } catch (err) {
       // Attach the LIFT obligation to error responses too. Without this,
-      // every save_strategy / close_session rejection drops the "MUST be
-      // close_session" anchor exactly when the agent most needs it — agents
+      // every save_strategy / end_drive rejection drops the "MUST be
+      // end_drive" anchor exactly when the agent most needs it — agents
       // reading just the bare error treat the failure as a one-off shape
       // complaint and end the turn after the user-facing goal looks done.
       let obligationLine = '';
