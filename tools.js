@@ -1005,7 +1005,7 @@ module.exports = function defineTools(klura) {
           session_id: { type: 'string' },
           prompt: {
             type: 'string',
-            description: 'Goal the user needs to complete, shown in the viewer header for the entire session. Describe the goal, not the current obstacle — the user may hit captcha → image challenge → login → 2FA in sequence and needs to see the goal through to the end. Good: "Log in to your account", "Complete the payment", "Connect your account", "Verify your identity". Bad: "Solve the captcha", "Tick the checkbox", "Enter the 2FA code" (too step-specific). The runtime appends ", then press Done or tell me in chat" automatically — leave that off.',
+            description: 'What the USER must do that the AGENT cannot — typically the auth/identity gate. NOT the full task: the agent resumes control after the user clicks Done and finishes the rest itself. Good: "Log in to your account", "Complete the payment authorization", "Connect your account", "Verify your identity". Bad — asks the user to do the agent\'s work: "Log in and send the message X to Y", "Log in and click Submit", "Find the chat with Bob and type hello" (the agent does the messaging / clicking after login). Bad — too step-specific: "Solve the captcha", "Enter the 2FA code", "Tick the checkbox" — the user may hit captcha → 2FA → login in sequence and the prompt sticks for all of them, so name the auth goal, not the current step. The runtime appends ", then press Done or tell me in chat" automatically — leave that off.',
           },
         },
         required: ['session_id'],
