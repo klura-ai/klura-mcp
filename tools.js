@@ -59,12 +59,7 @@ module.exports = function defineTools(klura) {
               notes: { type: 'string' },
             },
           },
-          graph: { type: 'string', enum: graphModes, description: 'Default: "discover". **Pick "discover" for any user-driven request, even ones requiring navigation through an unfamiliar site to find the right page** — the goal-directedness is what matters, not whether the path is known. "map" is ONLY for deliberate platform onboarding with no user goal in flight; declaring a `capability` on a `map` session is rejected (map has no lift phase). "discover": drive→triage→lift→closed. "map": drive→closed; mutating actions gate on a per-(action, selector) consent checkpoint, auto-synth is skipped at close, the re-persistence gate fires when ≥5 perform_actions land with zero persistence calls. "execute": execute→triage→lift→closed (or terminal{failed}); runs a saved strategy and on stale-strategy failure transitions into triage with the failure as defense-surface input — arg/auth/structural failures terminate with status: failed.' },
-          lift_mode: {
-            type: 'string',
-            enum: ['explicit_learn', 'skip'],
-            description: "LIFT behavior. 'explicit_learn' (default) — end_drive handoff is framed as a one-shot ask: 'answer delivered; should I spend rounds lifting this?' Agent composes a user prompt in its own voice from the inline triage bundle (current_tier, prior_attempts, discovery_artifact) + raw captures + get_platform_logbook, then waits for the user's yes/no. Standard interactive UX. 'skip' — no handoff; just let end_drive auto-synth drop whatever recorded-path it can. For autonomous runs without a human in the loop, register a checkpoint handler that resolves every relevant kind to `{status: 'continue'}` — see klura://reference#checkpoints.",
-          },
+          graph: { type: 'string', enum: graphModes, description: 'Default: "discover". **Pick "discover" for any user-driven request, even ones requiring navigation through an unfamiliar site to find the right page** — the goal-directedness is what matters, not whether the path is known. "map" is ONLY for deliberate platform onboarding with no user goal in flight; declaring a `capability` on a `map` session is rejected (map has no lift phase). "discover": drive→triage→lift→closed. "map": drive→closed; mutating actions gate on a one-time session-wide consent checkpoint, auto-synth is skipped at close, the re-persistence gate fires when ≥5 perform_actions land with zero persistence calls. "execute": execute→triage→lift→closed (or terminal{failed}); runs a saved strategy and on stale-strategy failure transitions into triage with the failure as defense-surface input — arg/auth/structural failures terminate with status: failed.' },
           identity: {
             type: 'string',
             description: 'Optional account name on `platform`. Default-when-omitted (or `"default"`) uses the historical platform-only cookie jar / profile — single-account behavior. Pass `"work"`, `"personal"`, etc. to scope cookies (`<platform>--<identity>.json`), the credential-autofill profile slot, and the warm-pool key so two accounts on the same platform never share state. Use this when the agent needs to "use account A and do X, use account B and do Y" in one conversation. See klura://reference#identities.',
@@ -78,7 +73,6 @@ module.exports = function defineTools(klura) {
         args: args.args,
         policy: args.policy,
         graph: args.graph,
-        lift_mode: args.lift_mode,
         identity: args.identity,
       }),
     },
