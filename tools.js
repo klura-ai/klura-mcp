@@ -85,20 +85,21 @@ module.exports = function defineTools(klura) {
 
     {
       name: 'perform_action',
-      description: 'Interact with the page. Actions: navigate (top-level page navigation; pass the target URL as `selector`), click, type, select (use CSS selectors), fill_editor (contenteditable rich-text editors — Lexical/Slate/Draft/ProseMirror — where type fails on zero-height bounding boxes), mouse_click (x,y coords), mouse_drag (from x,y to x,y), key_press, scroll. `type` APPENDS to existing field content (cursor lands at end, matches human typing behavior); when the field is empty this is identical to a full fill. Pass `replace: true` with `type` to clear the field first. Returns the updated accessibility tree (~2-4s on heavy DOMs). If your NEXT tool call is `get_network_log`, `get_screenshot`, or another `perform_action`, pass `return_tree: false` — it skips the a11y read, returns `{url}` only, and shaves a couple of seconds off the chain. Pass `page` to target a popup or `target=_blank` tab — the response\'s `subPages[]` lists open handles (`popup-1`, `popup-2`, ...). Default targets the main page.',
+      description: 'Interact with the page. Per-action args:\n  - click: selector (CSS / a11y / role-name)\n  - type: selector + text (the string to type — APPENDS by default; pass replace:true to clear first)\n  - fill_editor: selector + text (contenteditable rich-text editors — Lexical/Slate/Draft/ProseMirror — where type fails on zero-height bounding boxes)\n  - select: selector + text (the <option>\'s value attribute)\n  - key_press: selector + text (the key, e.g. "Enter", "Escape", "ArrowDown")\n  - mouse_click: selector="x,y" (coordinates as a string)\n  - mouse_drag: selector="x,y" (start) + text="x,y" (end)\n  - scroll: selector="x,y" (anchor, optional) + text="deltaX,deltaY"\n  - navigate: selector=<url> (top-level page navigation)\n\n`text` is the canonical name for the string-to-send, matching the Claude-in-Chrome convention. `value` is accepted as a deprecated alias for `text` and produces an identical effect. Returns the updated accessibility tree (~2-4s on heavy DOMs); pass `return_tree: false` when the next tool call (get_network_log, get_screenshot, another perform_action) will supersede the tree anyway. Pass `page` to target a popup or `target=_blank` tab — `subPages[]` lists open handles.',
       inputSchema: {
         type: 'object',
         properties: {
           session_id: { type: 'string' },
           action: { type: 'string', enum: ['navigate', 'click', 'type', 'select', 'fill_editor', 'mouse_click', 'mouse_drag', 'key_press', 'scroll'], description: 'Action to perform' },
-          selector: { type: 'string', description: 'CSS selector, text selector, coordinate pair "x,y", key name, or — when action="navigate" — the target URL. Field name is "selector" for dispatch consistency; semantics depend on action.' },
-          value: { type: 'string', description: 'Value for type/select/fill_editor, target "x,y" for mouse_drag, "deltaX,deltaY" for scroll' },
+          selector: { type: 'string', description: 'CSS / a11y selector for click/type/fill_editor/select/key_press; coordinate pair "x,y" for mouse_click/mouse_drag/scroll; target URL for navigate.' },
+          text: { type: 'string', description: 'For type/fill_editor: the string to type. For select: the <option> value to pick. For key_press: the key name (e.g. "Enter"). For mouse_drag: end coordinate "x,y". For scroll: "deltaX,deltaY". Matches Claude-in-Chrome\'s convention. Either `text` or `value` works (text wins if both given).' },
+          value: { type: 'string', description: 'Deprecated alias for `text`. Same semantics. Kept for backwards compatibility; prefer `text`.' },
           return_tree: { type: 'boolean', description: 'Default true. Set false when the next tool call is going to supersede the tree anyway (network log, screenshot, another interaction) — skips the ~2-4s a11y read.' },
           page: { type: 'string', description: 'Page handle. Default "main" (the page the session opened with). Pass a popup id from session.subPages[].id (e.g. "popup-1") to act on a tracked popup or target=_blank tab. Unknown handles reject with a list of the currently-open ones.' },
         },
         required: ['session_id', 'action', 'selector'],
       },
-      handler: (args) => klura.performAction(args.session_id, args.action, args.selector, args.value, {
+      handler: (args) => klura.performAction(args.session_id, args.action, args.selector, args.text ?? args.value, {
         returnTree: args.return_tree !== false,
         replace: args.replace === true,
         page: args.page,
