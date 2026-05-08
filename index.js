@@ -36,9 +36,19 @@ async function createKluraMcpServer() {
   const skillMd = klura.getSkillMd()
     .replace(/^---[\s\S]*?---\s*/, ''); // strip frontmatter
 
+  // Front-load a terse per-platform capability catalog so agents see what
+  // klura already knows BEFORE the first tool call. The list_platform_skills
+  // _hint only fires when the agent calls the tool, but the load-bearing
+  // failure mode (observed in field) is the agent skipping that call entirely
+  // and going straight to start_session for work an existing capability
+  // already covers. The deliberate principle break + always-save framing
+  // live in the rendered string itself (see getSavedSkillsSummaryMd).
+  const savedSkills = klura.getSavedSkillsSummaryMd();
+  const instructions = savedSkills ? `${skillMd}\n\n${savedSkills}` : skillMd;
+
   const server = new Server(
     { name: '@klura/mcp', version: '0.1.0' },
-    { capabilities: { tools: {}, resources: {} }, instructions: skillMd }
+    { capabilities: { tools: {}, resources: {} }, instructions }
   );
 
   // -- Resources (on-demand reference docs) --
@@ -132,7 +142,7 @@ async function createKluraMcpServer() {
 
   // -- Tool execution --
 
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
     const { name, arguments: rawArgs } = request.params;
     const tool = toolByName.get(name);
     if (!tool) {
@@ -142,6 +152,50 @@ async function createKluraMcpServer() {
       };
     }
     const args = coerceArgs(name, rawArgs);
+
+    // Progress notifications. When the client request carried
+    // `_meta.progressToken`, the SDK exposes it on `extra._meta` and gives us
+    // `extra.sendNotification` for sending `notifications/progress` bound to
+    // that token. Clients that honor this (Claude Desktop via MCP SDK with
+    // `resetTimeoutOnProgress: true`) reset their per-request timeout each
+    // time a progress arrives — turning a 4-minute hard deadline into a
+    // sliding window that survives long-running tools (end_drive on a real
+    // RE session does heavy synthesis + audit + handoff prose composition).
+    //
+    // Two emit paths:
+    //  - Explicit phase boundaries inside the tool (e.g. endDrive's
+    //    progress({stage: '...'}) calls). Names what's running so the user
+    //    sees specific status, not just "still working".
+    //  - 30s heartbeat for tools that don't emit explicit progress. Fires
+    //    only when no explicit progress arrived in the last interval, so
+    //    instrumented tools don't double-emit.
+    let progressCount = 0;
+    let lastProgressAt = Date.now();
+    let progress;
+    let heartbeat;
+    const progressToken = extra && extra._meta ? extra._meta.progressToken : undefined;
+    if (progressToken !== undefined && extra && typeof extra.sendNotification === 'function') {
+      progress = ({ stage, current, total } = {}) => {
+        progressCount += 1;
+        lastProgressAt = Date.now();
+        extra
+          .sendNotification({
+            method: 'notifications/progress',
+            params: {
+              progressToken,
+              progress: typeof current === 'number' ? current : progressCount,
+              ...(typeof total === 'number' ? { total } : {}),
+              ...(typeof stage === 'string' ? { message: stage } : {}),
+            },
+          })
+          .catch(() => { /* notification send failure is non-fatal */ });
+      };
+      heartbeat = setInterval(() => {
+        if (Date.now() - lastProgressAt >= 30000) {
+          progress({ stage: 'still working' });
+        }
+      }, 30000);
+    }
 
     try {
       // Phase admissibility — hard tool blocking per the session-phase
@@ -203,7 +257,7 @@ async function createKluraMcpServer() {
         });
       }
 
-      let result = await tool.handler(args);
+      let result = await tool.handler(args, { progress });
 
       // Inject sticky LIFT obligation reminder. Fires on every tool
       // response between the first mutating perform_action and either a
@@ -271,6 +325,8 @@ async function createKluraMcpServer() {
         content: [{ type: 'text', text: `${obligationLine}Error: ${msg}` }],
         isError: true,
       };
+    } finally {
+      if (heartbeat) clearInterval(heartbeat);
     }
   });
 
