@@ -1,6 +1,6 @@
 {
   "name": "@klura/mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publishConfig": {
     "access": "public"
   },
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "@klura/runtime": "^0.2.0"
+    "@klura/runtime": "^0.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
