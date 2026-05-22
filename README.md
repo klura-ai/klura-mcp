@@ -34,7 +34,7 @@ Restart the client. The agent picks up the klura toolset automatically.
 Two surfaces land in the agent's context:
 
 - **Tools** — browser automation (`start_session`, `perform_action`, `get_screenshot`, `get_a11y_tree`), discovery + persistence (`save_strategy`, `execute`, `list_platform_skills`, `get_strategy`), network-log inspection (`get_network_log`, `find_in_page`), and the reverse-engineering escape hatches (`inspect_ws_frame`, `try_generator`, `js_eval`, `get_js_source`, `search_js_source`, `read_js_function`, `set_breakpoint`, `wait_for_pause`, and more). The runtime owns the canonical list; this server mirrors it one-for-one.
-- **Resource** `klura://reference` — the detailed reference doc, served section-by-section via URL fragments (`klura://reference#reverse-engineer-playbook`, `klura://reference#strategy-schemas-overview`, etc.) so each response fits inside the MCP output budget. Fetch `klura://reference` with no fragment for a table of contents.
+- **Resource** `klura://reference` — the detailed reference doc, served section-by-section via URL fragments (`klura://reference#reverse-engineer-playbook`, `klura://reference#recorded-path-schema`, etc.) so each response fits inside the MCP output budget. Fetch `klura://reference` with no fragment for a table of contents.
 
 The always-loaded orientation is SKILL.md, passed as the server's `instructions` capability. Agents read SKILL.md on every conversation and pull detail on demand via the `klura://reference` fragments.
 
