@@ -334,6 +334,13 @@ async function createKluraMcpServer() {
 }
 
 async function main() {
+  // Latch this process as driven by an external MCP host BEFORE anything else.
+  // This is the load-bearing layer of the agent guardrail: with the flag set,
+  // the optional klura CLI LLM agent refuses to run, so it can never start a
+  // second LLM underneath the host that is already driving klura. Stdio is the
+  // external-host transport; the in-memory transport the CLI agent and the
+  // test harnesses use never reaches this path.
+  require('@klura/runtime').markExternalMcpHost();
   const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
   const server = await createKluraMcpServer();
   const transport = new StdioServerTransport();
