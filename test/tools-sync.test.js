@@ -19,7 +19,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const kluraPkgRoot = path.dirname(require.resolve('@klura/runtime/package.json'));
-const { TOOL_REGISTRY } = require('@klura/runtime');
+const { GRAPH_MODES, TOOL_REGISTRY } = require('@klura/runtime');
 const { TOOL_DEFS: CONSUMER_TOOL_DEFS } = require(
   path.join(kluraPkgRoot, 'dist', 'consumer', 'mcp-tools.js'),
 );
@@ -37,13 +37,6 @@ test('tools: every consumer tool name appears in klura SKILL.md', () => {
 });
 
 test('tools: start_session graph enum mirrors runtime GRAPH_MODES', () => {
-  const startSessionSrc = fs.readFileSync(
-    path.join(kluraPkgRoot, 'src', 'tools', 'start-session.ts'),
-    'utf8',
-  );
-  const match = startSessionSrc.match(/export const GRAPH_MODES = \[([^\]]+)\] as const/);
-  assert.ok(match, 'GRAPH_MODES export missing from start-session.ts');
-  const GRAPH_MODES = [...match[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
   const start = TOOL_REGISTRY.find((tool) => tool.name === 'start_session');
   assert.ok(start, 'start_session missing');
   assert.deepEqual([...start.inputSchema.properties.graph.enum], GRAPH_MODES);
