@@ -1,7 +1,5 @@
 // Lint-test for the MCP tool catalog. Three guarantees:
-//   1. every tool name appears in klura's SKILL.md (the "three surfaces in
-//      sync" rule — adding a tool to MCP without mentioning it in SKILL.md
-//      leaves agents unaware of it);
+//   1. every consumer tool name appears in klura's consumer-first SKILL.md;
 //   2. start_session description mentions every GRAPH_MODE the runtime
 //      exports (the description embeds the list and would otherwise drift
 //      when a new mode lands);
@@ -22,19 +20,20 @@ const path = require('node:path');
 
 const kluraPkgRoot = path.dirname(require.resolve('@klura/runtime/package.json'));
 const { TOOL_REGISTRY } = require('@klura/runtime');
+const { TOOL_DEFS: CONSUMER_TOOL_DEFS } = require(
+  path.join(kluraPkgRoot, 'dist', 'consumer', 'mcp-tools.js'),
+);
 
-test('tools: every tool name appears in klura SKILL.md', () => {
+test('tools: every consumer tool name appears in klura SKILL.md', () => {
   const skillMd = fs.readFileSync(path.join(kluraPkgRoot, 'SKILL.md'), 'utf8');
+  const consumerNames = new Set(CONSUMER_TOOL_DEFS.map((tool) => tool.name));
   const missing = [];
   for (const tool of TOOL_REGISTRY) {
+    if (!consumerNames.has(tool.name)) continue;
     // Tool names are snake_case so substring match is enough.
     if (!skillMd.includes(tool.name)) missing.push(tool.name);
   }
-  assert.deepEqual(
-    missing,
-    [],
-    `tools missing from klura SKILL.md: ${missing.join(', ')}`,
-  );
+  assert.deepEqual(missing, [], `tools missing from klura SKILL.md: ${missing.join(', ')}`);
 });
 
 test('tools: start_session graph enum mirrors runtime GRAPH_MODES', () => {
