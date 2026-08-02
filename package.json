@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "start": "node index.js",
+    "pretest": "npm --prefix ../runtime run build",
     "test": "node --test test/*.test.js"
   },
   "keywords": [
